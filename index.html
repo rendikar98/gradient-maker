@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Gradient Maker</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+    <script src="https://unpkg.com/interactjs/dist/interact.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+
+        <div class="hero">
+            <h1 class="hero_title">Gradient Maker</h1>
+            <p class="hero_shortdesc">Create and export beautiful gradients.</p>
+        </div>
+
+
+        <div class="gradient-maker">
+            <div class="gradient-maker_control">
+                <div class="gradient-maker_slider">
+                    <div class="gradient-maker_slider-track"
+                        style="background: linear-gradient(90deg, rgb(252, 219, 202) 0%, rgb(230, 165, 204) 49%, rgb(213, 179, 232) 100%);">
+                    </div>
+
+                    <div class="gradient-maker_slider-points">
+                        <div class="gradient-maker_slider-point is-active" data-color="rgb(252, 219, 202)" data-stop="0"
+                            style="transform: translateX(-0%); left: 0%;">
+                            <span style="background: rgb(252, 219, 202)"></span>
+                        </div>
+
+                        <div class="gradient-maker_slider-point" data-color="rgb(230, 165, 204)" data-stop="50"
+                            style="transform: translateX(-50%); left: 50%;">
+                            <span style="background: rgb(230, 165, 204)"></span>
+                        </div>
+
+                        <div class="gradient-maker_slider-point" data-color="rgb(213, 179, 232)" data-stop="100"
+                            style="transform: translateX(-100%); left: 100%;">
+                            <span style="background: rgb(213, 179, 232)"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gradient-maker_colorpicker"></div>
+                <div class="gradient-maker_colorhex">
+                    <div class="gradient-maker_colorhex-swatch" style="background: #FCDBCA"></div>
+                    <input class="gradient-maker_colorhex-input" value="#FCDBCA">
+                </div>
+
+                <div class="gradient-maker_properties">
+                    <div class="form-group">
+                        <label for="gradient_type" class="label">
+                            Type
+                        </label>
+
+                        <select name="gradient_type" id="gradient_type" class="input">
+                            <option value="linear">Linear</option>
+                            <option value="radial">Radial</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="angle" class="label">
+                            Angle
+                        </label>
+
+                        <input type="text" class="input" value="90°">
+                    </div>
+                </div>
+
+
+                <div class="gradient-maker_control-action">
+                    <button class="btn btn-primary">Copy CSS</button>
+                </div>
+
+            </div>
+
+            <div class="gradient-maker_preview"
+                style="background-image: linear-gradient(rgb(252, 219, 202) 0%, rgb(230, 165, 204) 49%, rgb(213, 179, 232) 100%);">
+            </div>
+        </div>
+
+    </div>
+
+
+    <script>
+        const gradientSliderTrack = document.querySelector('.gradient-maker_slider-track')
+        const gradientPreview = document.querySelector('.gradient-maker_preview')
+        const gradientColorPicker = document.querySelector('.gradient-maker_colorpicker')
+        const gradientPoints = document.querySelectorAll('.gradient-maker_slider-point')
+
+
+        // TODO: create color picker 
+        
+        // TODO: set active color when click on gradient points
+        
+
+        // TODO: make gradient points draggable
+        
+
+        // TODO: create functionality for copy the css of created gradient 
+    </script>
+</body>
+
+</html>
