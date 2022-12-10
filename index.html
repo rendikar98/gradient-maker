@@ -14,12 +14,10 @@
 
 <body>
     <div class="container">
-
         <div class="hero">
             <h1 class="hero_title">Gradient Maker</h1>
             <p class="hero_shortdesc">Create and export beautiful gradients.</p>
         </div>
-
 
         <div class="gradient-maker">
             <div class="gradient-maker_control">
@@ -29,17 +27,17 @@
                     </div>
 
                     <div class="gradient-maker_slider-points">
-                        <div class="gradient-maker_slider-point is-active" data-color="rgb(252, 219, 202)" data-stop="0"
+                        <div class="gradient-maker_slider-point is-active" data-color="#FCDBCA" data-stop="0"
                             style="transform: translateX(-0%); left: 0%;">
                             <span style="background: rgb(252, 219, 202)"></span>
                         </div>
 
-                        <div class="gradient-maker_slider-point" data-color="rgb(230, 165, 204)" data-stop="50"
+                        <div class="gradient-maker_slider-point" data-color="#E6A5CC" data-stop="50"
                             style="transform: translateX(-50%); left: 50%;">
                             <span style="background: rgb(230, 165, 204)"></span>
                         </div>
 
-                        <div class="gradient-maker_slider-point" data-color="rgb(213, 179, 232)" data-stop="100"
+                        <div class="gradient-maker_slider-point" data-color="#D5B3E8" data-stop="100"
                             style="transform: translateX(-100%); left: 100%;">
                             <span style="background: rgb(213, 179, 232)"></span>
                         </div>
@@ -47,6 +45,7 @@
                 </div>
 
                 <div class="gradient-maker_colorpicker"></div>
+
                 <div class="gradient-maker_colorhex">
                     <div class="gradient-maker_colorhex-swatch" style="background: #FCDBCA"></div>
                     <input class="gradient-maker_colorhex-input" value="#FCDBCA">
@@ -73,15 +72,15 @@
                     </div>
                 </div>
 
-
                 <div class="gradient-maker_control-action">
-                    <button class="btn btn-primary">Copy CSS</button>
+                    <input type="text" id="generated-gradient" style="display: none;">
+                    <button id="btn-copy" class="btn btn-primary">Copy CSS</button>
                 </div>
 
             </div>
 
             <div class="gradient-maker_preview"
-                style="background-image: linear-gradient(rgb(252, 219, 202) 0%, rgb(230, 165, 204) 49%, rgb(213, 179, 232) 100%);">
+                style="background-image: linear-gradient(90deg, rgb(252, 219, 202) 0%, rgb(230, 165, 204) 49%, rgb(213, 179, 232) 100%);">
             </div>
         </div>
 
@@ -95,19 +94,138 @@
         const gradientPoints = document.querySelectorAll('.gradient-maker_slider-point')
 
 
+        const generateGradientCss = function () {
+            let sliderTrackBackgroundCss = ''
+            const colorPoints = Array.from(gradientPoints).map(function (item) {
+                return {
+                    color: item.dataset.color,
+                    stop: item.dataset.stop
+                }
+            })
+
+            colorPoints.sort(function (a, b) {
+                return a.stop - b.stop
+            })
+
+            colorPoints.forEach(function (point, index) {
+                sliderTrackBackgroundCss += `${point.color} ${point.stop}%`
+                if (index !== gradientPoints.length - 1) {
+                    sliderTrackBackgroundCss += ', '
+                }
+            })
+
+            return `linear-gradient(90deg, ${sliderTrackBackgroundCss})`
+        }
+
+        const updateGradientSliderTrack = function () {
+            gradientSliderTrack.style.background = generateGradientCss()
+        }
+
+        const updateGradientPreview = function () {
+            gradientPreview.style.background = generateGradientCss()
+        }
+
         // TODO: create color picker 
-    
+        const colorPicker = new iro.ColorPicker('.gradient-maker_colorpicker', {
+            color: '#FCDBCA',
+            width: 562,
+            layout: [{
+                    component: iro.ui.Box,
+                    options: {
+                        boxHeight: 200
+                    }
+                },
+                {
+                    component: iro.ui.Slider,
+                    options: {
+                        sliderType: 'hue'
+                    }
+                }
+            ]
+        })
+
         // TODO: listen colorpicker on change
+        colorPicker.on('color:change', function (color) {
+            // update point color
+            const currentActivePoint = document.querySelector('.gradient-maker_slider-point.is-active')
+            currentActivePoint.querySelector('span').style.background = color.hexString
+
+            // update data color attribute
+            currentActivePoint.dataset.color = color.hexString.toUpperCase()
+
+            // update preview color
+            const previewColor = document.querySelector('.gradient-maker_colorhex-swatch')
+            previewColor.style.background = color.hexString
+
+            // update the input color
+            const inputColor = document.querySelector('.gradient-maker_colorhex-input')
+            inputColor.value = color.hexString.toUpperCase()
+
+            updateGradientSliderTrack()
+            updateGradientPreview()
+        })
 
         // TODO: set active color when click on gradient points
-    
+
+        const onPointClicks = function (event) {
+            const currentActivePoint = document.querySelector(
+                '.gradient-maker_slider-point.is-active')
+            currentActivePoint.classList.remove('is-active')
+
+            event.target.classList.add('is-active')
+
+            const selectedColor = event.target.dataset.color
+            colorPicker.color.set(selectedColor)
+        }
+
+        gradientPoints.forEach(function (element) {
+            element.addEventListener('click', onPointClicks)
+        })
+
+
         // TODO: make gradient points draggable
-   
-        // TODO: update the gradient track and preview when points is dragged
+        interact('.gradient-maker_slider-point').draggable({
+            origin: 'parent',
+            modifiers: [
+                interact.modifiers.restrict({
+                    restriction: 'parent'
+                })
+            ],
+            listeners: {
+                start: onPointClicks,
+                move: function (event) {
+                    const moveDelta = event.pageX / gradientSliderTrack.offsetWidth
+                    const moveDeltaPercent = parseInt(moveDelta * 100)
+                    event.target.style.left = `${moveDeltaPercent}%`
+                    event.target.style.transform = `translateX(-${moveDeltaPercent}%)`
+                    event.target.dataset.stop = moveDeltaPercent
+
+                    updateGradientSliderTrack()
+                    updateGradientPreview()
+                }
+            }
+        })
 
         // TODO: update the gradient track and preview when properties changed
 
         // TODO: create functionality for copy the css of created gradient 
+        const btnCopy = document.querySelector('#btn-copy')
+        const gradientHiddenInput = document.querySelector('#generated-gradient')
+        btnCopy.addEventListener('click', async function () {
+            try {
+                const gradientCss = generateGradientCss()
+                gradientHiddenInput.value = gradientCss
+                gradientHiddenInput.select()
+                gradientHiddenInput.setSelectionRange(0, 99999);
+
+                // Copy the text inside the text field
+                await navigator.clipboard.writeText(gradientCss);
+
+                alert('css copied')
+            } catch (error) {
+                console.log(error)
+            }
+        })
     </script>
 </body>
 
